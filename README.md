@@ -18,3 +18,11 @@ You can balance connections at different ports at the same host, using haproxy.
 The number maxconn parameter at server entry, limit the number of sockets connection at the same port.
 You must fit this value according you host parameters.
 All sockets at 80 port will be redirect at 8500 .. 85XX socket.io ports.
+
+SYSCTL - kernel parameters
+Net kernel parameter must be increased to allow high level open process and open sockets.
+net.core.somaxconn = 3240000
+net.core.wmem_max = 25165824
+net.core.rmem_max = 25165824
+net.core.wmem_default = 124928
+net.core.rmem_default = 124928
