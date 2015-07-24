@@ -23,12 +23,13 @@ io.on('disconnect', function () {
 	io.disconnect();
 });
 io.on('subscription confirm', function (msg) {
+	console.log(msg);
 	switch (msg.data) {
 		case 0:
-			logger.debug('[' + id + '] (0) connection confirm from ' + ip + ' port ' + port);
+			logger.debug('['+msg.socket+'] - [' + id + ']  connection confirm from ' + ip + ' port ' + port);
 			break;
 		case 1:
-			logger.debug('[' + id + '] (1) connection confirm from ' + ip + ' port ' + port);
+			logger.debug('['+msg.socket+'] - [' + id + ']  connection confirm from ' + ip + ' port ' + port);
 			break;
 		default:
 			logger.debug('data not recognized');
@@ -38,7 +39,10 @@ io.on('subscription confirm', function (msg) {
 io.on('msgFromServer', function (msg) {
 	switch (msg.data.code) {
 		case 1:
-			logger.debug('[' + id + '] message received from ' + ip + ' port ' + port + ' content ' + msg.data.data);
+			logger.debug('[' + id + '] [broadcast] message received from ' + ip + ' port ' + port + ' content ' + msg.data.data);
+			break;
+		case 2:
+			logger.debug('[' + id + '] ['+msg.data.socketId+'] message received from ' + ip + ' port ' + port + ' content ' + msg.data.data);
 			break;
 		default:
 			logger.debug('data not recognized');

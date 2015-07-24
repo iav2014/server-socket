@@ -8,7 +8,6 @@ var ip = process.argv[4] || 'localhost'
 	}
 	, ioPort = port;
 var ackBroadcast = 0;
-console.log(count);
 for (var i = 0; i < count; i++) {
 	var nodeId = i + 1;
 	nodes.io[i] = fork('client.js', [port, nodeId, ip]);

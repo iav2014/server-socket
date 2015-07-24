@@ -18,7 +18,7 @@ var theHTTPLog = morgan(':remote-addr - :method :url HTTP/:http-version :status 
 });
 // configuration parameters
 var mx = process.argv[0];
-var _servers = (mx.indexOf('JXcore') > 0) ? process.argv[3] || 5 : process.argv[2] || 5;
+var _servers = (mx.indexOf('JXcore') > 0) ? process.argv[3] || 5 : process.argv[2] || 2;
 var _initialServerPort = process.argv[3] || 8500;
 var _restHost = '0.0.0.0';
 var _restPort = 3000;
@@ -98,6 +98,14 @@ app.listen(_restPort, _restHost, function () {
 		}
 		res.send('msg sent:' + req.params.msg);
 	});
+	router.get('/sendto/:id/:msg', function (req, res) {
+		for (var i = 0; i < _servers; i++) {
+			serverNodes.io[i].send({code: 2, socketId: req.params.id, data: req.params.msg, pid: serverNodes.io[i].pid});
+		}
+		res.send('msg sent:' + req.params.msg);
+
+	});
+
 });
 
 

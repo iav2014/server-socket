@@ -22,13 +22,13 @@ io.sockets.on('connection', function (socket) {
 				ld = devices.length;
 				for (ind = 0; ind < ld; ind++) {
 					if (socket === devices[ind].socket) {
-						devices[ind].socket.emit('subscription confirm', {data: 0});
+						devices[ind].socket.emit('subscription confirm', {data: 0,socket:socket.id});
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
-					socket.emit('subscription confirm', {data: 1});
+					socket.emit('subscription confirm', {data: 1,socket:socket.id});
 					devices.push({socket: socket});
 					var obj = JSON.stringify({numClients: devices.length, numPid: process.pid, port: port});
 					redis.set(idProcess, obj, function (err, result) {
@@ -84,6 +84,15 @@ io.sockets.on('connection', function (socket) {
 				for (var i = 0; i < devices.length; i++) {
 					if (socket === devices[i].socket) {
 						devices[i].socket.emit('msgFromServer', {data: m});
+					}
+				}
+				break;
+			case 2:
+				for (var i = 0; i < devices.length; i++) {
+					if (socket === devices[i].socket) {
+						if (devices[i].socket.id== m.socketId) {
+							devices[i].socket.emit('msgFromServer', {data: m});
+						}
 					}
 				}
 				break;
