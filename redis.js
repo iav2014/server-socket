@@ -1,4 +1,3 @@
-'use strict';
 var logger = require('./logger').logger(__filename);
 var redisStore = require('redis');
 

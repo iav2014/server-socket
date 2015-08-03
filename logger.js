@@ -32,7 +32,9 @@ module.exports.logger = function (operationCode) {
 				line = frame.getLineNumber();
 				column = frame.getColumnNumber();
 				method = frame.getFunctionName();
-				method === null ? method = 'anonymous' : method = method;
+				if(method === null){
+					method = 'anonymous';
+				}
 				var operation;
 				operation = operationCode ? operationCode : 'NA';
 				var formatedMessage = util.format('%s|[%s(%s,%s)]|[%s]|%s',

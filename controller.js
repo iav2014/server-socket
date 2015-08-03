@@ -33,7 +33,7 @@ app.use('/', router);
 app.use(methodOverride());
 
 var serverNodes = {io: []};
-var clientsInCluster = new Array;
+var clientsInCluster = [];
 app.listen(_restPort, _restHost, function () {
 	logger.info('REST Server started at [' + _restHost + ',' + _restPort + ']');
 	redis.init(function (err) {
@@ -41,11 +41,14 @@ app.listen(_restPort, _restHost, function () {
 			logger.error(err);
 			process.exit(1);
 		}
-	})
+	});
 	for (var i = 0; i < _servers; i++) {
-		redis.set(i, 0x20, function (err, result) {
-			if (err) logger.error(err);
-		})
+		redisApply(i);
+		/*
+		 redis.set(i, 0x20, function (err, result) {
+		 if (err) logger.error(err);
+		 });
+		 */
 		var childServerPort = parseInt(_initialServerPort) + i;
 		var nodeId = i;
 		serverNodes.io[i] = fork('server.js', [childServerPort, nodeId]);
@@ -58,9 +61,15 @@ app.listen(_restPort, _restHost, function () {
 			load: 0
 		});
 	}
+	function redisApply(i) {
+		redis.set(i, 0x20, function (err, result) {
+			if (err) logger.error(err);
+		});
+	}
+
 	function msgFromChildServer(msg) {
 		var totalClients = 0;
-		if (clientsInCluster != null) {
+		if (clientsInCluster !== null) {
 			for (var i = 0; i < clientsInCluster.length; i++) {
 				if (clientsInCluster[i].numPid == msg.numPid) {
 					clientsInCluster[i].load = ((msg.numClients * 100) / _limit);
@@ -72,21 +81,28 @@ app.listen(_restPort, _restHost, function () {
 	}
 
 	router.get('/load', function (req, res) {
-		logger.info('load REST called:');
+		logger.info('load2 REST called:');
+		var forEach = require('async-foreach').forEach;
 		var json = [];
 		var j = 0;
-		for (var i = 0; i < _servers; ++i) {
-			redis.get(i, function (err, replies) {
+		forEach(clientsInCluster, function (worker, index, arr) {
+			var done = this.async();
+			console.log(index);
+			redis.get(index, function (err, replies) {
 				if (replies != 0x20) json.push(JSON.parse(replies));
-				if (++j == _servers) {
+				done();
+			});
 
-					if (json.length === 0) {
-						res.send('no active connections');
-					} else res.send(json);
-				}
-			})
-		}
+		}, function (done, array) {
+			logger.debug('load2 send workers');
+			if (json.length === 0) {
+				res.send('no active connections');
+			} else res.send(json);
+		});
+
 	});
+
+
 	router.get('/process', function (req, res) {
 		logger.debug('process REST called:');
 		res.send(clientsInCluster);

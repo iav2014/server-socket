@@ -1,7 +1,7 @@
 ﻿var logger = require('./logger').logger(__filename);
 var port = process.argv[2] || 8500,
 	id = process.argv[3] || 8500,
-	ip = process.argv[4] || 'localhost'
+	ip = process.argv[4] || 'localhost';
 var io = require('socket.io-client')('http://localhost:' + port);
 
 logger.debug(ip + ':' + port + ' ' + id);

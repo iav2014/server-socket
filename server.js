@@ -22,13 +22,13 @@ io.sockets.on('connection', function (socket) {
 				ld = devices.length;
 				for (ind = 0; ind < ld; ind++) {
 					if (socket === devices[ind].socket) {
-						devices[ind].socket.emit('subscription confirm', {data: 0,socket:socket.id});
+						devices[ind].socket.emit('subscription confirm', {data: 0, socket: socket.id});
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
-					socket.emit('subscription confirm', {data: 1,socket:socket.id});
+					socket.emit('subscription confirm', {data: 1, socket: socket.id});
 					devices.push({socket: socket});
 					var obj = JSON.stringify({numClients: devices.length, numPid: process.pid, port: port});
 					redis.set(idProcess, obj, function (err, result) {
@@ -37,7 +37,7 @@ io.sockets.on('connection', function (socket) {
 							logger.debug('update to redis, key:' + idProcess + ' new value:' + obj);
 							process.send({numClients: devices.length, numPid: process.pid, port: port});
 						}
-					})
+					});
 				}
 				break;
 			default:
@@ -60,16 +60,24 @@ io.sockets.on('connection', function (socket) {
 			if (devices[i].socket == id) {
 				logger.info('socket deleted - socket:' + id.id);
 				devices.splice(i, 1);
-				redis.set(idProcess, JSON.stringify({
+				redisApply(idProcess, JSON.stringify({
 					numClients: devices.length,
 					numPid: process.pid,
 					port: port
-				}), function (err, result) {
-					if (err) logger.error(err);
-					else {
-						logger.debug('update to redis (decrement socket), key:' + idProcess);
-					}
-				});
+				}));
+				/*
+				 redis.set(idProcess, JSON.stringify({
+				 numClients: devices.length,
+				 numPid: process.pid,
+				 port: port
+				 }), function (err, result) {
+				 if (err) logger.error(err);
+				 else {
+				 logger.debug('update to redis (decrement socket), key:' + idProcess);
+				 }
+				 });
+				 */
+
 				return (true);
 			}
 		}
@@ -77,6 +85,14 @@ io.sockets.on('connection', function (socket) {
 	}
 
 	process.on('message', msgFromController);
+	function redisApply(idProcess, json) {
+		redis.set(idProcess, json, function (err, result) {
+			if (err) logger.error(err);
+			else {
+				logger.debug('update to redis (decrement socket), key:' + idProcess);
+			}
+		});
+	}
 
 	function msgFromController(m) {
 		switch (m.code) {
@@ -88,10 +104,10 @@ io.sockets.on('connection', function (socket) {
 				}
 				break;
 			case 2:
-				for (var i = 0; i < devices.length; i++) {
-					if (socket === devices[i].socket) {
-						if (devices[i].socket.id== m.socketId) {
-							devices[i].socket.emit('msgFromServer', {data: m});
+				for (var ii = 0; ii < devices.length; ii++) {
+					if (socket === devices[ii].socket) {
+						if (devices[ii].socket.id == m.socketId) {
+							devices[ii].socket.emit('msgFromServer', {data: m});
 						}
 					}
 				}

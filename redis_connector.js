@@ -20,7 +20,7 @@ RedisConnector.prototype = {
 		return function (err, result) {
 			if (err) callback(err);
 			else callback(null, JSON.parse(result));
-		}
+		};
 	},
 
 	init: function (config, callback) {
@@ -29,14 +29,14 @@ RedisConnector.prototype = {
 			if (err.message.indexOf('ECONNREFUSED') > 0) callback(err);
 		});
 		this.conn.on("connect", function (err) {
-			callback(err, this.conn)
+			callback(err, this.conn);
 		});
 	},
 
 	findOne: function (params, callback) {
 		this.conn.get(params.key, function (err, result) {
 			callback(err, JSON.parse(result));
-		})
+		});
 	},
 
 	set: function (key, value, callback) {
@@ -50,7 +50,7 @@ RedisConnector.prototype = {
 			}
 		});
 	}
-}
+};
 
 module.exports = RedisConnector;
 
