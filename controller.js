@@ -21,7 +21,7 @@ var mx = process.argv[0];
 var _servers = (mx.indexOf('JXcore') > 0) ? process.argv[3] || 5 : process.argv[2] || 2;
 var _initialServerPort = process.argv[3] || 8500;
 var _restHost = '0.0.0.0';
-var _restPort = 3000;
+var _restPort = 80;
 var _limit = 5000;
 
 app.use(bodyParser.urlencoded({
