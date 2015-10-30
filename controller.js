@@ -81,20 +81,19 @@ app.listen(_restPort, _restHost, function () {
 	}
 
 	router.get('/load', function (req, res) {
-		logger.info('load2 REST called:');
+		logger.info('load REST called:');
 		var forEach = require('async-foreach').forEach;
 		var json = [];
 		var j = 0;
 		forEach(clientsInCluster, function (worker, index, arr) {
 			var done = this.async();
-			console.log(index);
 			redis.get(index, function (err, replies) {
 				if (replies != 0x20) json.push(JSON.parse(replies));
 				done();
 			});
 
 		}, function (done, array) {
-			logger.debug('load2 send workers');
+			logger.debug('load send workers');
 			if (json.length === 0) {
 				res.send('no active connections');
 			} else res.send(json);

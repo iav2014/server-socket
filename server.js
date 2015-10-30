@@ -2,7 +2,7 @@ var logger = require('./logger').logger(__filename);
 var redis = require('./redis');
 var port = process.argv[2] || 8001,
 	idProcess = process.argv[3] || 8000;
-var io = require('socket.io')(port);
+var io = require('socket.io')(port,'0.0.0.0');
 var devices = [];
 var ind, ld;
 process.setMaxListeners(10000);
