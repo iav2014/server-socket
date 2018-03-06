@@ -2,17 +2,15 @@ var logger = require('./logger').logger(__filename);
 var redis = require('./redis');
 var port = process.argv[2] || 8001,
 	idProcess = process.argv[3] || 8000;
-var io = require('socket.io')(port,'0.0.0.0');
+var io = require('socket.io')(port, '0.0.0.0');
 var devices = [];
 var ind, ld;
 process.setMaxListeners(10000);
 redis.init(function (err) {
 	if (err) logger.error(err);
 });
-
 var redisAdapter = require('socket.io-redis');
 io.adapter(redisAdapter({host: 'localhost', port: 6379}));
-
 logger.debug('[' + idProcess + '] server at port ' + port);
 io.sockets.on('connection', function (socket) {
 	socket.on('newMessage', function (data) {
@@ -65,25 +63,12 @@ io.sockets.on('connection', function (socket) {
 					numPid: process.pid,
 					port: port
 				}));
-				/*
-				 redis.set(idProcess, JSON.stringify({
-				 numClients: devices.length,
-				 numPid: process.pid,
-				 port: port
-				 }), function (err, result) {
-				 if (err) logger.error(err);
-				 else {
-				 logger.debug('update to redis (decrement socket), key:' + idProcess);
-				 }
-				 });
-				 */
 
 				return (true);
 			}
 		}
 		return false;
 	}
-
 	process.on('message', msgFromController);
 	function redisApply(idProcess, json) {
 		redis.set(idProcess, json, function (err, result) {
@@ -93,7 +78,6 @@ io.sockets.on('connection', function (socket) {
 			}
 		});
 	}
-
 	function msgFromController(m) {
 		switch (m.code) {
 			case 1:

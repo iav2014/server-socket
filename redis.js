@@ -1,6 +1,5 @@
 var logger = require('./logger').logger(__filename);
 var redisStore = require('redis');
-
 var AsbtractRedisClient = {
 	init: function (callback) {
 		this.conn = redisStore.createClient();
@@ -8,7 +7,6 @@ var AsbtractRedisClient = {
 			logger.error(err);
 			callback(err);
 		});
-
 		this.conn.on("connect", function (err) {
 			if (err) {
 				logger.error(err);
@@ -21,7 +19,6 @@ var AsbtractRedisClient = {
 		});
 	}
 };
-
 AsbtractRedisClient.get = function (key, callback) {
 	this.conn.get(key, function (err, reply) {
 		if (err) {

@@ -13,7 +13,7 @@ for (var p = port; p < port + split; p++) {
 	for (var c = 0; c < num; c++) {
 		logger.debug('port:' + p, ' sockets:' + c, ' sequential:' + seq);
 		seq++;
-		start({ip: ip, port: p, seq: seq,id:seq})
+		start({ip: ip, port: p, seq: seq,id:seq});
 	}
 }
 
@@ -55,10 +55,10 @@ function start(data) {
 	io.on('msgFromServer', function (msg) {
 		switch (msg.data.code) {
 			case 1:
-				logger.debug('[' + data.id + '] [broadcast] message received from ' + data.ip + ' port ' + data.port + ' content ' + msg.data.data);
+				logger.debug('[' + data.id + '][' + msg.data.socketId + '] [broadcast] message received from ' + data.ip + ' port ' + data.port + ' content ' + msg.data.data);
 				break;
 			case 2:
-				logger.debug('[' + data.id + '] [' + msg.data.socketId + '] message received from ' + data.ip + ' port ' + data.port + ' content ' + msg.data.data);
+				logger.debug('[' + data.id + '][' + msg.data.socketId + '] message received from ' + data.ip + ' port ' + data.port + ' content ' + msg.data.data);
 				break;
 			default:
 				logger.debug('data not recognized');
@@ -68,7 +68,5 @@ function start(data) {
 	process.on('message', msgFromMaster);
 	function msgFromMaster(m) {
 	}
-
-
 }
 

@@ -21,9 +21,8 @@ var mx = process.argv[0];
 var _servers = (mx.indexOf('JXcore') > 0) ? process.argv[3] || 5 : process.argv[2] || 2;
 var _initialServerPort = process.argv[3] || 8500;
 var _restHost = '0.0.0.0';
-var _restPort = 80;
+var _restPort = 8080;
 var _limit = 5000;
-
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
@@ -31,7 +30,6 @@ app.use(bodyParser.json({limit: '5mb'}));
 app.use(theHTTPLog);
 app.use('/', router);
 app.use(methodOverride());
-
 var serverNodes = {io: []};
 var clientsInCluster = [];
 app.listen(_restPort, _restHost, function () {
@@ -44,11 +42,6 @@ app.listen(_restPort, _restHost, function () {
 	});
 	for (var i = 0; i < _servers; i++) {
 		redisApply(i);
-		/*
-		 redis.set(i, 0x20, function (err, result) {
-		 if (err) logger.error(err);
-		 });
-		 */
 		var childServerPort = parseInt(_initialServerPort) + i;
 		var nodeId = i;
 		serverNodes.io[i] = fork('server.js', [childServerPort, nodeId]);
@@ -66,7 +59,6 @@ app.listen(_restPort, _restHost, function () {
 			if (err) logger.error(err);
 		});
 	}
-
 	function msgFromChildServer(msg) {
 		var totalClients = 0;
 		if (clientsInCluster !== null) {
@@ -79,7 +71,6 @@ app.listen(_restPort, _restHost, function () {
 			}
 		}
 	}
-
 	router.get('/load', function (req, res) {
 		logger.info('load REST called:');
 		var forEach = require('async-foreach').forEach;
@@ -91,7 +82,6 @@ app.listen(_restPort, _restHost, function () {
 				if (replies != 0x20) json.push(JSON.parse(replies));
 				done();
 			});
-
 		}, function (done, array) {
 			logger.debug('load send workers');
 			if (json.length === 0) {
@@ -100,8 +90,6 @@ app.listen(_restPort, _restHost, function () {
 		});
 
 	});
-
-
 	router.get('/process', function (req, res) {
 		logger.debug('process REST called:');
 		res.send(clientsInCluster);
@@ -118,9 +106,7 @@ app.listen(_restPort, _restHost, function () {
 			serverNodes.io[i].send({code: 2, socketId: req.params.id, data: req.params.msg, pid: serverNodes.io[i].pid});
 		}
 		res.send('msg sent:' + req.params.msg);
-
 	});
-
 });
 
 
